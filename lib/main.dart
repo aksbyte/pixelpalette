@@ -1,16 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pixel_palette/bloc/category_wallpaper/category_cubit.dart';
 import 'package:pixel_palette/bloc/theme_cubit.dart';
 import 'package:pixel_palette/bloc/wallpaper_cubit.dart';
+import 'package:pixel_palette/domain/repositories/category_repository.dart';
 import 'package:pixel_palette/domain/repositories/wallpaper_repository.dart';
 import 'package:pixel_palette/domain/usecases/get_wallpaper.dart';
 import 'package:pixel_palette/screen/home_screen.dart';
+import 'package:pixel_palette/services/get_it.dart';
 import 'package:pixel_palette/services/theme_manager.dart';
 
 void main() {
   final Dio dio = Dio();
-
+  setupLocator();
   runApp(MyApp(dio: dio));
 }
 
@@ -28,6 +31,9 @@ class MyApp extends StatelessWidget {
                 GetWallpaper(WallpaperRepositoryImpl(dio: dio)))),
         BlocProvider<ThemeCubit>(
           create: (context) => ThemeCubit(),
+        ),
+        BlocProvider(
+          create: (context) => CollectionCubit(getIt<CollectionRepository>()),
         )
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(

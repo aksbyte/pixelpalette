@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pixel_palette/bloc/wallpaper_cubit.dart';
 import 'package:pixel_palette/bloc/wallpaper_state.dart';
 import 'package:pixel_palette/screen/wallpaper_detail_screen.dart';
+import 'package:pixel_palette/widgets/category_card.dart';
 
 import '../bloc/theme_cubit.dart';
 import '../services/theme_manager.dart';
@@ -45,20 +47,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  int _changePageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      //  extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(appBarTitle),
         actions: [
           IconButton(
             icon: const Icon(CupertinoIcons.search),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.favorite_outlined),
             onPressed: () {},
           ),
           BlocBuilder<ThemeCubit, ThemeMode>(
@@ -74,7 +73,60 @@ class _HomePageState extends State<HomePage> {
       ),
       //backgroundColor: Colors.grey[200],
       //backgroundColor: Colors.black45,
-      body: BlocBuilder<WallpaperCubit, WallpaperState>(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 10, top: 10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              width: MediaQuery.sizeOf(context).width,
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                  borderRadius: BorderRadius.circular(30)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _changePageIndex = 1;
+                        });
+                      },
+                      icon: const Icon(Icons.grid_view_rounded)),
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _changePageIndex = 0;
+                        });
+                      },
+                      icon: const Icon(Icons.watch_later_rounded)),
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _changePageIndex = 2;
+                        });
+                      },
+                      icon: const Icon(Icons.favorite_outlined)),
+                ],
+              ),
+            ),
+          ),
+          _changePageIndex == 0 ? buildGridView() : const SizedBox.shrink(),
+          _changePageIndex == 1
+              ? const CategoryCard() : const SizedBox.shrink(),
+              _changePageIndex == 2 ? Container(
+                  height: 40,
+                  width: 50,
+                  color: Colors.green,
+                ): const SizedBox.shrink()
+        ],
+      ),
+    );
+  }
+
+  Expanded buildGridView() {
+    return Expanded(
+      child: BlocBuilder<WallpaperCubit, WallpaperState>(
         builder: (context, state) {
           if (state is WallpaperLoading) {
             return const Center(child: CupertinoActivityIndicator());
